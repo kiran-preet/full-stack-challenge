@@ -30,20 +30,23 @@ COPY . /var/www/html
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
 # Install Node dependencies
-RUN npm install
+RUN npm install && npm run build
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage
 
-#delete if already exists to avoid integrity issues
-# This ensures that the database file is fresh and ready for migrations
-RUN rm -f /var/www/html/database/database.sqlite
-# Ensure SQLite database file exists
-RUN touch /var/www/html/database/database.sqlite
 
-# Expose ports for backend and frontend
-EXPOSE 8000 5173
+# Create storage link
+RUN php artisan storage:link
 
-# Start both Laravel and Vite dev servers
-CMD bash -c "php artisan migrate --force && php artisan db:seed --force && php artisan storage:link && php artisan serve --host=0.0.0.0 --port=8000 & npm run build -- --host 0.0.0.0 --port 5173"
+
+# Health check and entrypoint script
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD curl -f http://localhost:8000 || exit 1
+
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+ENTRYPOINT ["docker-entrypoint.sh"]
+
+EXPOSE 8000

@@ -4,6 +4,12 @@ import vue from '@vitejs/plugin-vue';
 
 export default defineConfig({
     base : '/',
+    server: {
+        https: true, // Force Vite to use HTTPS in dev (optional)
+        hmr: {
+            host: 'full-stack-challenge-production-ddbc.up.railway.app',
+        },
+    },
     plugins: [
         laravel({
             input: ['resources/css/app.css','resources/js/app.ts'],

@@ -43,4 +43,4 @@ RUN touch /var/www/html/database/database.sqlite
 EXPOSE 8000 5173
 
 # Start both Laravel and Vite dev servers
-CMD bash -c "php artisan migrate --force && php artisan db:seed --force && php artisan storage:link && php artisan serve --host=0.0.0.0 --port=8000 & npm run dev -- --host 0.0.0.0 --port 5173"
+CMD bash -c "php artisan migrate --force && php artisan db:seed --force && php artisan storage:link && php artisan serve --host=0.0.0.0 --port=8000 & npm run build -- --host 0.0.0.0 --port 5173"

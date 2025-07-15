@@ -1,25 +1,26 @@
 <?php
 
 // app/Http/Controllers/JobController.php
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
 use App\Models\Job;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Http\Controllers\Controller;
 
-class JobController extends Controller
+class AdminJobController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Jobs/Index', [
+        return Inertia::render('Admin/Jobs/Index', [
             'jobs' => Job::with('company')->latest()->paginate(10),
         ]);
     }
 
     public function create()
     {
-        return Inertia::render('Jobs/Create', [
+        return Inertia::render('Admin/Jobs/Create', [
             'companies' => Company::all(),
         ]);
     }
@@ -44,19 +45,20 @@ class JobController extends Controller
 
         Job::create($validated);
 
-        return redirect()->route('jobs.index')->with('success', 'Job created successfully.');
+        return redirect()->route('admin.jobs.index')->with('success', 'Job created successfully.');
     }
 
     public function show(Job $job)
     {
-        return Inertia::render('Jobs/Show', [
+        return Inertia::render('Admin/Jobs/Show', [
             'job' => $job->load('company'),
+            'isAdmin' => auth()->user()?->is_admin ?? false,
         ]);
     }
 
     public function edit(Job $job)
     {
-        return Inertia::render('Jobs/Edit', [
+        return Inertia::render('Admin/Jobs/Edit', [
             'job' => $job,
             'companies' => Company::all(),
         ]);
@@ -82,12 +84,12 @@ class JobController extends Controller
 
         $job->update($validated);
 
-        return redirect()->route('jobs.index')->with('success', 'Job updated successfully.');
+        return redirect()->route('admin.jobs.index')->with('success', 'Job updated successfully.');
     }
 
     public function destroy(Job $job)
     {
         $job->delete();
-        return redirect()->route('jobs.index')->with('success', 'Job deleted successfully.');
+        return redirect()->route('admin.jobs.index')->with('success', 'Job deleted successfully.');
     }
 }

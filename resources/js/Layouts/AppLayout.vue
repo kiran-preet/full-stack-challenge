@@ -1,12 +1,19 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
+import { Link, Head } from '@inertiajs/vue3';
+import { route } from 'ziggy-js'; // Explicit import
 import { ref, computed } from 'vue';
 
 const showingNavigationDropdown = ref(false);
+const props = defineProps({
+    title: String
+});
 </script>
 
 <template>
     <div>
+        <Head>
+            <title>{{ title || 'Job Board' }}</title>
+        </Head>
         <nav class="bg-white border-b border-gray-100">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16">
@@ -30,7 +37,7 @@ const showingNavigationDropdown = ref(false);
                                 </Link>
                                 <Link
                                     v-if="$page.props?.auth?.user"
-                                    :href="route('companies.index')"
+                                    :href="route('admin.companies.index')"
                                     class="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium"
                                     :class="{ 'text-indigo-600': $page.url.startsWith('/companies') }"
                                 >
@@ -38,11 +45,20 @@ const showingNavigationDropdown = ref(false);
                                 </Link>
                                 <Link
                                     v-if="$page.props?.auth?.user"
-                                    :href="route('jobs.index')"
+                                    :href="route('admin.jobs.index')"
                                     class="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium"
                                     :class="{ 'text-indigo-600': $page.url.startsWith('/jobs') }"
                                 >
                                     Jobs
+                                </Link>
+                                <Link
+                                    v-if="$page.props?.auth?.user"
+                                    :href="route('logout')"
+                                    method="post"
+                                    as="button"
+                                    class="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium"
+                                >
+                                    Logout
                                 </Link>
                             </div>
                         </div>
@@ -51,7 +67,7 @@ const showingNavigationDropdown = ref(false);
             </div>
         </nav>
 
-        <main>
+        <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <slot />
         </main>
     </div>

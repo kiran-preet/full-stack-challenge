@@ -40,21 +40,16 @@ class Job extends Model
     }
     public function scopeFilter($query, array $filters)
     {
+
         $query->when($filters['position_type'] ?? false, fn($query, $positionType) => 
             $query->where('position_type', $positionType)
         );
 
-        $query->when($filters['salary'] ?? false, function($query, $salaryRange) {
-            if ($salaryRange === '0-50000') {
-                $query->where('salary_max', '<=', 50000);
-            } elseif ($salaryRange === '50000-100000') {
-                $query->whereBetween('salary_min', [50000, 100000]);
-            } elseif ($salaryRange === '100000-150000') {
-                $query->whereBetween('salary_min', [100000, 150000]);
-            } elseif ($salaryRange === '150000+') {
-                $query->where('salary_min', '>=', 150000);
-            }
-        });
+        // Support salary slider (salary_min and salary_max)
+        if (isset($filters['salary_min']) && isset($filters['salary_max'])) {
+            $query->where('salary_min', '>=', (float)$filters['salary_min'])
+                  ->where('salary_max', '<=', (float)$filters['salary_max']);
+        }
 
         $query->when($filters['company'] ?? false, fn($query, $company) => 
             $query->whereHas('company', fn($query) => 

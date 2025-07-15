@@ -16,8 +16,8 @@ class JobFactory extends Factory
             'title' => $this->faker->jobTitle(),
             'description' => $this->faker->paragraphs(3, true),
             'location' => $this->faker->city(),
-            'salary_min' => $this->faker->randomFloat(2, 30000, 150000),
-            'salary_max' => $this->faker->randomFloat(2, 30000, 150000),
+            'salary_min' => $this->faker->randomFloat(2, 30000, 70000),
+            'salary_max' => $this->faker->randomFloat(2, 70000, 150000),
             'position_type' => $this->faker->randomElement(['remote', 'in-person', 'hybrid']),
             'salary_currency' => 'USD',
             'is_published' => $this->faker->boolean(70), // 70% chance of being published

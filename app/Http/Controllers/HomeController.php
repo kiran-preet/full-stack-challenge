@@ -11,7 +11,7 @@ class HomeController extends Controller
     {
         $jobs = Job::with('company')
             ->latestPublished()
-            ->filter(request()->only('position_type', 'salary', 'company', 'location'))
+            ->filter(request()->only('position_type', 'salary_min', 'salary_max', 'company', 'location'))
             ->paginate(10)
             ->withQueryString();
 

@@ -3,7 +3,7 @@ import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue';
 
 export default defineConfig({
-    base : '/',
+    base : 'https://full-stack-challenge-production-ddbc.up.railway.app/',
     server: {
         https: true, // Force Vite to use HTTPS in dev (optional)
         hmr: {

@@ -21,11 +21,16 @@ COPY --from=composer:2.5 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 
 # Copy existing application directory contents
+# ...existing code...
 COPY . /var/www/html
+
+# Install Composer dependencies
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage
+# ...existing code...
 
 # Expose port 8000
 EXPOSE 8000

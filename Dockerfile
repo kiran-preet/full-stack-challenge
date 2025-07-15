@@ -36,6 +36,9 @@ RUN npm install
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage
 
+#delete if already exists to avoid integrity issues
+# This ensures that the database file is fresh and ready for migrations
+RUN rm -f /var/www/html/database/database.sqlite
 # Ensure SQLite database file exists
 RUN touch /var/www/html/database/database.sqlite
 

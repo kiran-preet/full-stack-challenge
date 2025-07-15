@@ -21,7 +21,7 @@ services:
       - "8000:8000"
     depends_on:
       - node
-    command: bash -c "rm -f /var/www/html/database/database.sqlite && php artisan migrate --force && php artisan db:seed --force && php artisan storage:link && php artisan serve --host=0.0.0.0 --port=8000"
+    command: bash -c "rm -f /var/www/html/database/database.sqlite && touch /var/www/html/database/database.sqlite && php artisan migrate --force && php artisan db:seed --force && php artisan storage:link && php artisan serve --host=0.0.0.0 --port=8000"
 
   node:
     image: node:22

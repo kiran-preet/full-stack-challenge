@@ -1,7 +1,6 @@
 # Dockerfile for Laravel PHP app
 FROM php:8.2-fpm
 
-# Install system dependencies
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libonig-dev \
@@ -9,7 +8,9 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     git \
-    curl
+    curl \
+    nodejs \
+    npm
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd
@@ -24,15 +25,22 @@ WORKDIR /var/www/html
 # ...existing code...
 COPY . /var/www/html
 
+
 # Install Composer dependencies
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+
+# Install Node dependencies
+RUN npm install
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage
-# ...existing code...
-RUN touch /var/www/html/database/database.sqlite
-# Expose port 8000
-EXPOSE 8000
 
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+# Ensure SQLite database file exists
+RUN touch /var/www/html/database/database.sqlite
+
+# Expose ports for backend and frontend
+EXPOSE 8000 5173
+
+# Start both Laravel and Vite dev servers
+CMD bash -c "php artisan migrate --force && php artisan db:seed --force && php artisan storage:link && php artisan serve --host=0.0.0.0 --port=8000 & npm run dev -- --host 0.0.0.0 --port 5173"

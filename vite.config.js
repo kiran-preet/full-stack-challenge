@@ -24,4 +24,14 @@ export default defineConfig({
             },
         }),
     ],
+    build: {
+        manifest: true,
+        outDir: 'public/build', // Explicitly set output directory
+        rollupOptions: {
+            output: {
+                assetFileNames: 'assets/[name]-[hash][extname]',
+                entryFileNames: 'assets/[name]-[hash].js',
+            }
+        }
+    },
 });

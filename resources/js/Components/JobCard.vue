@@ -16,7 +16,7 @@ defineProps<{
                         <div class="shrink-0">
                             <img 
                                 v-if="job.company.logo" 
-                                :src="`/storage/${job.company.logo}`" 
+                                :src="`/${job.company.logo}`" 
                                 :alt="job.company.name" 
                                 class="h-12 w-12 rounded-full object-cover"
                                 loading="lazy"

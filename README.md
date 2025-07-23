@@ -47,6 +47,8 @@ A modern job board application built with Laravel, Inertia.js, Vue 3, Tailwind C
    - Backend: http://localhost:8000
    - Frontend:http://localhost:5173 (if using Vite dev server)
 
+5. For Admin login please update the username and password in /database/seeders/AdminUserSeederphp 
+   The url is http://localhost:8000/login
 ## Database & Storage
 - Uses SQLite by default (`database/database.sqlite`).
 - Storage symlink for public file access:

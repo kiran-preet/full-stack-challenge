@@ -4,7 +4,7 @@ import JobCard from '@/Components/JobCard.vue';
 import JobFilters from '@/Components/JobFilters.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { Job } from '@/types';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 
 // Dark mode handling
 const darkMode = ref(false);
@@ -48,10 +48,25 @@ const props = defineProps<{
 }>();
 
 // Reactive state
-const jobsList = ref([...props.jobs.data]);
-const nextPageUrl = ref(props.jobs.next_page_url);
+const jobsList = ref<Job[]>([]);
+const nextPageUrl = ref<string | null>(null);
 const loadingMore = ref(false);
 const filtersLoading = ref(false);
+
+// Initialize state from props
+const initializeFromProps = () => {
+  jobsList.value = [...props.jobs.data];
+  nextPageUrl.value = props.jobs.next_page_url || null;
+};
+
+// Initialize on component mount
+onMounted(initializeFromProps);
+
+// Watch for prop changes (happens when filters change)
+watch(() => props.jobs, (newJobs) => {
+  jobsList.value = [...newJobs.data];
+  nextPageUrl.value = newJobs.next_page_url || null;
+}, { deep: true });
 
 const handleLoading = (isLoading: boolean) => {
   filtersLoading.value = isLoading;
@@ -64,20 +79,14 @@ async function loadMoreJobs() {
   loadingMore.value = true;
   
   try {
-    // Ensure HTTPS if needed
-    let url = nextPageUrl.value;
-    if (window.location.protocol === 'https:' && url.startsWith('http:')) {
-      url = url.replace('http:', 'https:');
-    }
-
-    const response = await router.get(url, {}, {
+    const response = await router.get(nextPageUrl.value, {}, {
       preserveState: true,
       preserveScroll: true,
       only: ['jobs'],
       onSuccess: (page) => {
         // Append new jobs to existing list
         jobsList.value = [...jobsList.value, ...page.props.jobs.data];
-        nextPageUrl.value = page.props.jobs.next_page_url;
+        nextPageUrl.value = page.props.jobs.next_page_url || null;
 
         // Smooth scroll to the newly loaded content
         /*setTimeout(() => {
@@ -97,7 +106,6 @@ async function loadMoreJobs() {
 </script>
 
 <template>
-  <!-- Rest of your template remains exactly the same -->
   <div :class="{ dark: darkMode }">
     <AppLayout>
       <!-- Dark Mode Toggle -->
@@ -143,7 +151,7 @@ async function loadMoreJobs() {
           </div>
           
           <!-- Load More Button -->
-          <div class="mt-8 flex justify-center" v-if="nextPageUrl">
+          <div class="mt-8 flex justify-center" v-if="nextPageUrl && !filtersLoading">
             <button
               @click="loadMoreJobs"
               :disabled="loadingMore"
@@ -161,7 +169,7 @@ async function loadMoreJobs() {
           </div>
           
           <!-- End of results message -->
-          <div v-if="!nextPageUrl && jobsList.length > 0" class="text-center py-4">
+          <div v-if="!nextPageUrl && jobsList.length > 0 && !filtersLoading" class="text-center py-4">
             <p class="text-gray-500 dark:text-gray-400 italic">You've reached the end of the results</p>
           </div>
           

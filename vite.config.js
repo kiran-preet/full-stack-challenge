@@ -6,7 +6,7 @@ export default defineConfig({
     base : 'https://full-stack-challenge-production-ddbc.up.railway.app/build/',
     server: {
         host: '0.0.0.0', // Allow external connections
-        https: true, // Force Vite to use HTTPS in dev (optional)
+        https: true, // remove this for development
         hmr: {
             host: 'full-stack-challenge-production-ddbc.up.railway.app',
         },

@@ -29,21 +29,23 @@ A modern job board application built with Laravel, Inertia.js, Vue 3, Tailwind C
    ```sh
    cp .env.example .env
    ```
+3. Update env variables and vite configs
+   - for local dev update .env 
+      APP_URL=http://localhost:8000
+      VITE_APP_URL=http://localhost:5173
+   - vite.config.js
+      remove https: true
+      update base to http://localhost:5173
+      and host to localhost
+
+   -- You can start docker without following above step, it will build the project and run it.
 3. **Build and start containers:**
    ```sh
    docker-compose up --build
    ```
-4. **Install frontend dependencies:**
-   ```sh
-   npm install
-   ```
-5. **Run Vite dev server (in another terminal):**
-   ```sh
-   npm run dev
-   ```
-6. **Access the app:**
+4. **Access the app:**
    - Backend: http://localhost:8000
-   - Frontend: http://localhost:5173 (if using Vite dev server)
+   - Frontend:http://localhost:5173 (if using Vite dev server)
 
 ## Database & Storage
 - Uses SQLite by default (`database/database.sqlite`).

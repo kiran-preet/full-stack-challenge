@@ -85,7 +85,7 @@ async function loadMoreJobs() {
   }
 
   try {
-    const response = await router.get(nextPageUrl.value, {}, {
+    const response = await router.get(nextUrl.value, {}, {
       preserveState: true,
       preserveScroll: true,
       only: ['jobs'],

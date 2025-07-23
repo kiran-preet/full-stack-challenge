@@ -69,8 +69,11 @@ function loadMoreJobs() {
   if (!props.jobs.next_page_url) return;
   
   loadingMore.value = true;
-  
-  router.get(props.jobs.next_page_url, {}, {
+  let nextUrl = props.jobs.next_page_url;
+  if (window.location.protocol === 'https:' && nextUrl.startsWith('http:')) {
+    nextUrl = nextUrl.replace('http:', 'https:');
+  }
+  router.get(nextUrl, {}, {
     preserveState: true,
     preserveScroll: true,
     only: ['jobs'],

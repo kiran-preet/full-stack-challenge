@@ -23,7 +23,11 @@ class AppServiceProvider extends ServiceProvider
     {
         Vite::prefetch(concurrency: 3);
         if (env('APP_ENV') === 'production') {
-            URL::forceScheme('https');
+            URL::forceScheme('https');            
+        }
+        // Force Vite to use production assets
+        if (!app()->isLocal()) {
+            \Illuminate\Support\Facades\Config::set('vite.build_path', 'build');
         }
     }
 }

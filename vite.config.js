@@ -3,11 +3,12 @@ import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue';
 
 export default defineConfig({
-    base : 'https://full-stack-challenge-production-ddbc.up.railway.app/',
+    base : 'http://localhost:8000/build/',
     server: {
+        host: '0.0.0.0', // Allow external connections
         https: true, // Force Vite to use HTTPS in dev (optional)
         hmr: {
-            host: 'full-stack-challenge-production-ddbc.up.railway.app',
+            host: 'localhost',
         },
     },
     plugins: [
@@ -27,12 +28,17 @@ export default defineConfig({
     build: {
         manifest: true,
         outDir: 'public/build', // Explicitly set output directory
+        emptyOutDir: true,     
         rollupOptions: {
             output: {
                 assetFileNames: 'assets/[name]-[hash][extname]',
                 entryFileNames: 'assets/[name]-[hash].js',
             }
-        },
-        base: '/build',
+        }
     },
+    resolve: {
+        alias: {
+            '@': '/resources/js',
+        },
+    }
 });

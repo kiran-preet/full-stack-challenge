@@ -3,12 +3,12 @@ import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue';
 
 export default defineConfig({
-    base : 'http://localhost:8000/build/',
+    base : 'http://full-stack-challenge-production-ddbc.up.railway.app:8000/build/',
     server: {
         host: '0.0.0.0', // Allow external connections
         https: true, // Force Vite to use HTTPS in dev (optional)
         hmr: {
-            host: 'localhost',
+            host: 'full-stack-challenge-production-ddbc.up.railway.app',
         },
     },
     plugins: [

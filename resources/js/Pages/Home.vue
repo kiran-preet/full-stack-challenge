@@ -78,6 +78,12 @@ async function loadMoreJobs() {
   
   loadingMore.value = true;
   
+  // Ensure the URL uses HTTPS if we're on HTTPS
+  let nextUrl = nextPageUrl.value;
+  if (window.location.protocol === 'https:' && nextUrl.startsWith('http:')) {
+    nextUrl = nextUrl.replace('http:', 'https:');
+  }
+
   try {
     const response = await router.get(nextPageUrl.value, {}, {
       preserveState: true,

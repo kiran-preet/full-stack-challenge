@@ -4,7 +4,7 @@ import JobCard from '@/Components/JobCard.vue';
 import JobFilters from '@/Components/JobFilters.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { Job } from '@/types';
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted } from 'vue';
 
 // Dark mode handling
 const darkMode = ref(false);
@@ -21,11 +21,7 @@ function toggleDarkMode() {
 }
 
 function updateDarkClass(isDark: boolean) {
-  if (isDark) {
-    document.documentElement.classList.add('dark');
-  } else {
-    document.documentElement.classList.remove('dark');
-  }
+  document.documentElement.classList.toggle('dark', isDark);
 }
 
 // Props definition
@@ -52,42 +48,56 @@ const props = defineProps<{
 }>();
 
 // Reactive state
+const jobsList = ref([...props.jobs.data]);
+const nextPageUrl = ref(props.jobs.next_page_url);
 const loadingMore = ref(false);
 const filtersLoading = ref(false);
 
 const handleLoading = (isLoading: boolean) => {
-  filtersLoading.value = isLoading; // Directly assign boolean value
+  filtersLoading.value = isLoading;
 };
-// Watch for filter changes from parent
-watch(() => props.jobs, (newJobs) => {
-  // Scroll to top when filters change
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-});
 
 // Load more jobs handler
-function loadMoreJobs() {
-  if (!props.jobs.next_page_url) return;
+async function loadMoreJobs() {
+  if (!nextPageUrl.value || loadingMore.value) return;
   
   loadingMore.value = true;
-  let nextUrl = props.jobs.next_page_url;
-  if (window.location.protocol === 'https:' && nextUrl.startsWith('http:')) {
-    nextUrl = nextUrl.replace('http:', 'https:');
-  }
-  router.get(nextUrl, {}, {
-    preserveState: true,
-    preserveScroll: true,
-    only: ['jobs'],
-    onSuccess: () => {
-      loadingMore.value = false;
-    },
-    onError: () => {
-      loadingMore.value = false;
+  
+  try {
+    // Ensure HTTPS if needed
+    let url = nextPageUrl.value;
+    if (window.location.protocol === 'https:' && url.startsWith('http:')) {
+      url = url.replace('http:', 'https:');
     }
-  });
+
+    const response = await router.get(url, {}, {
+      preserveState: true,
+      preserveScroll: true,
+      only: ['jobs'],
+      onSuccess: (page) => {
+        // Append new jobs to existing list
+        jobsList.value = [...jobsList.value, ...page.props.jobs.data];
+        nextPageUrl.value = page.props.jobs.next_page_url;
+
+        // Smooth scroll to the newly loaded content
+        /*setTimeout(() => {
+          const lastJobCard = document.querySelector('.job-card:last-child');
+          if (lastJobCard) {
+            lastJobCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        }, 100);*/
+      }
+    });
+  } catch (error) {
+    console.error('Error loading more jobs:', error);
+  } finally {
+    loadingMore.value = false;
+  }
 }
 </script>
 
 <template>
+  <!-- Rest of your template remains exactly the same -->
   <div :class="{ dark: darkMode }">
     <AppLayout>
       <!-- Dark Mode Toggle -->
@@ -125,15 +135,15 @@ function loadMoreJobs() {
           <!-- Jobs List -->
           <div v-else class="space-y-6">
             <JobCard 
-              v-for="job in jobs.data" 
+              v-for="job in jobsList" 
               :key="job.id" 
               :job="job" 
-              class="transition-all duration-300 hover:scale-[1.01]"
+              class="job-card transition-all duration-300 hover:scale-[1.01]"
             />
           </div>
           
           <!-- Load More Button -->
-          <div class="mt-8 flex justify-center" v-if="jobs.next_page_url">
+          <div class="mt-8 flex justify-center" v-if="nextPageUrl">
             <button
               @click="loadMoreJobs"
               :disabled="loadingMore"
@@ -150,8 +160,13 @@ function loadMoreJobs() {
             </button>
           </div>
           
+          <!-- End of results message -->
+          <div v-if="!nextPageUrl && jobsList.length > 0" class="text-center py-4">
+            <p class="text-gray-500 dark:text-gray-400 italic">You've reached the end of the results</p>
+          </div>
+          
           <!-- Empty State -->
-          <div v-if="!filtersLoading && jobs.data.length === 0" class="text-center py-12">
+          <div v-if="!filtersLoading && jobsList.length === 0" class="text-center py-12">
             <p class="text-gray-500 dark:text-gray-400 text-lg">No jobs found matching your criteria.</p>
             <Link 
               :href="route('home')" 
